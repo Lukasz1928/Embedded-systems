@@ -2,20 +2,27 @@ import pygame
 import pygame.camera
 from pygame.locals import *
 from sys import exit
+from time import sleep
 import time
 
 SIZE = (640, 480)
-FILENAME = 'capture.png'
+
+def tryInitCamera():
+    pygame.init()
+    print("Initializing camera", end='', flush=True)
+    for i in range(0, 10):
+        pygame.camera.init()
+        print(".", end='', flush=True)
+        cam_ids = pygame.camera.list_cameras()
+        if len(cam_ids) > 0:
+            print("\rCamera initialized succesfully")
+            return pygame.camera.Camera(cam_ids[0], SIZE, "RGB")
+        sleep(1)
+    print("\rCamera could not be initialized")
+    end()
 
 def main():
-    pygame.init()
-    pygame.camera.init()
-
-    cam_ids = pygame.camera.list_cameras()
-    if len(cam_ids) < 1:
-        print("Camera not detected")
-        end()
-    camera = pygame.camera.Camera(cam_ids[0], SIZE, "RGB")
+    camera = tryInitCamera()
     
     display = pygame.display.set_mode(SIZE, 0)
 
@@ -47,11 +54,11 @@ def end(camera=None):
 
 def toGrayscale(screen):
     for i in range(SIZE[0]):
-	for j in range(SIZE[1]):
-	    pixel = screen.get_at((i,j))
-	    grayValue = toGray(pixel)
-	    pixel = (grayValue, grayValue, grayValue)
-	    screen.set_at((i,j), pixel)
+        for j in range(SIZE[1]):
+            pixel = screen.get_at((i,j))
+            grayValue = toGray(pixel)
+            pixel = (grayValue, grayValue, grayValue)
+            screen.set_at((i,j), pixel)
     return screen
 
 def diffImg(t0, t1, t2):
@@ -61,7 +68,7 @@ def diffImg(t0, t1, t2):
     return bitwise_and(t1, t2)
 
 def pixelDiff(p1, p2):
-    result = Color(abs(p1[0] - p2[0]), abs(p1[1] - p2[1]), abs(p1[2] - p2[2]), (p1[3] - p2[3]) / 2)
+    result = Color(abs(p1[0] - p2[0]), abs(p1[1] - p2[1]), abs(p1[2] - p2[2]), round((p1[3] - p2[3]) / 2))
     return result
 
 def absdiff(s1, s2):
