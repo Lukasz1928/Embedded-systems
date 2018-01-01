@@ -3,7 +3,7 @@ from sys import exit
 from time import sleep
 import time
 from parser import ArgParser
-from copy import deepcopy
+from IncorrectArgumentsException import *
 
 SIZE = (640, 480)
 X1, Y1, X2, Y2 = 0, 0, SIZE[0], SIZE[1]
@@ -55,25 +55,26 @@ def main():
     cam = tryInitCamera()
 
     prev2 = None
-    prev2Scale = None
+    prev2Part = None
     prev = readCamera(cam)
-    prevScale = cv2.cvtColor(prev[X1:X2, Y1:Y2], cv2.COLOR_RGB2GRAY)
+    prevPart = cv2.cvtColor(prev[X1:X2, Y1:Y2], cv2.COLOR_RGB2GRAY)
     curr = readCamera(cam)
-    currScale = cv2.cvtColor(curr[X1:X2, Y1:Y2], cv2.COLOR_RGB2GRAY)
+    currPart = cv2.cvtColor(curr[X1:X2, Y1:Y2], cv2.COLOR_RGB2GRAY)
 
     capture = True
     while capture:
-        prev2Scale = prevScale
+        prev2Part = prevPart
         prev2 = prev
-        prevScale = currScale
+        prevPart = currPart
         prev = curr
         curr = readCamera(cam)
+        
+        currPart = cv2.cvtColor(curr[X1:X2, Y1:Y2], cv2.COLOR_RGB2GRAY)
+        diff = diffImg(prev2Part, prevPart, currPart)
 
-        currScale = cv2.cvtColor(curr[X1:X2, Y1:Y2], cv2.COLOR_RGB2GRAY)
-        diff = diffImg(prev2Scale, prevScale, currScale)
-
-        curr[X1:X2, Y1:Y2] = cv2.cvtColor(diff, cv2.COLOR_GRAY2RGB)
-        cv2.imshow(windowName, curr)
+        partDiff = curr[:,:]
+        partDiff[X1:X2, Y1:Y2] = cv2.cvtColor(diff, cv2.COLOR_GRAY2RGB)
+        cv2.imshow(windowName, partDiff)
         if cv2.waitKey(1) & 0xFF == ord('q'):
               capture = False
 

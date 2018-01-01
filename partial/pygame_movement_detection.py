@@ -1,5 +1,6 @@
 import pygame
 import pygame.camera
+from pygame import Surface
 from pygame.locals import *
 from sys import exit
 from time import sleep
@@ -9,7 +10,6 @@ from parser import ArgParser
 from copy import copy
 
 SIZE = (640, 480)
-X1, Y1, X2, Y2 = 0, 0, SIZE[0], SIZE[1]
 
 def tryInitCamera():
     pygame.init()
@@ -27,12 +27,13 @@ def tryInitCamera():
 
 def main():
     parser = ArgParser(SIZE[0], SIZE[1])
+    X1, Y1, X2, Y2 = 0, 0, SIZE[0], SIZE[1]
     try:
     	X1, Y1, X2, Y2 = parser.parse()
     except IncorrectArgumentsException as e:
     	print("ERROR: ", e)
     	end()
-    	
+
     camera = tryInitCamera()
     
     display = pygame.display.set_mode(SIZE, 0)
@@ -42,15 +43,24 @@ def main():
     capture = True
 
     prev2 = None
-    prev  = toGrayscale(camera.get_image())
-    curr = toGrayscale(camera.get_image())
+    prev2Part = None
+    prev  = camera.get_image()
+    prevPart = toGrayscale(prev, tl=(X1, Y1), br=(X2, Y2))
+    curr = camera.get_image()
+    currPart = toGrayscale(curr, tl=(X1, Y1), br=(X2, Y2))
     while capture:
         prev2 = prev
+        prev2Part = prevPart
         prev = curr
-        image = camera.get_image()
-        curr = toGrayscale(image)
-        diff = diffImg(prev2, prev, curr)
-        display.blit(diff, (0, 0))
+        prevPart = currPart
+        curr = camera.get_image()
+
+        currPart = toGrayscale(curr, tl=(X1, Y1), br=(X2, Y2))
+        diff = diffImg(prev2Part, prevPart, currPart, tl=(X1, Y1), br=(X2, Y2))
+        
+        partDiff = copy(curr)
+        partDiff.blit(diff, (X1, Y1))
+        display.blit(partDiff, (0, 0))
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == KEYDOWN and event.key == K_q:
@@ -65,39 +75,38 @@ def end(camera=None):
     print("Program ended")
     exit()   
 
-def toGrayscale(screen):
-    for i in range(X1, X2):
-        for j in range(Y1, Y2):
+def toGrayscale(screen, tl=(0, 0), br=SIZE):
+    result = Surface((br[0] - tl[0], br[1] - tl[1]))
+    for i in range(tl[0], br[0]):
+        for j in range(tl[1], br[1]):
             pixel = screen.get_at((i,j))
             grayValue = toGray(pixel)
             pixel = (grayValue, grayValue, grayValue)
-            screen.set_at((i,j), pixel)
-    return screen
+            result.set_at((i - tl[0],j - tl[1]), pixel)
+    return result
 
-def diffImg(t0, t1, t2):
-    d1 = absdiff(t2, t1)
-    d2 = absdiff(t1, t0)
-    #return d2
-    return bitwise_and(d1, d2)
+def diffImg(t0, t1, t2, tl=(0, 0), br=SIZE):
+    d1 = absdiff(t2, t1, tl=tl, br=br)
+    d2 = absdiff(t1, t0, tl=tl, br=br)
+    return bitwise_and(d1, d2, tl=tl, br=br)
 
 def pixelDiff(p1, p2):
-    result = Color(abs(p1[0] - p2[0]), abs(p1[1] - p2[1]), abs(p1[2] - p2[2]), round((p1[3] + p2[3]) / 2))
+    result = Color(abs(p1[0] - p2[0]), abs(p1[1] - p2[1]), abs(p1[2] - p2[2]), round(abs(p1[3] + p2[3]) / 2))
     return result
 
-def absdiff(s1, s2):
-    result = s1
-    for i in range(X1, X2):
-        for j in range(Y1, Y2):
-            result.set_at((i, j), pixelDiff(s1.get_at((i, j)), s2.get_at((i, j))))
+def absdiff(s1, s2, tl=(0, 0), br=SIZE):
+    result = Surface((br[0] - tl[0], br[1] - tl[1]))
+    for i in range(tl[0], br[0]):
+        for j in range(tl[1], br[1]):
+            result.set_at((i - tl[0], j - tl[1]), pixelDiff(s1.get_at((i - tl[0], j - tl[1])), s2.get_at((i - tl[0], j - tl[1]))))
     return result
 
-def bitwise_and(s1, s2):
-    result = copy(s1)
-    for i in range(X1, X2):
-        for j in range(Y1, Y2):
-            c = s1.get_at((i, j))[0] & s2.get_at((i, j))[0]
-            print(str(s1.get_at((i, j))[0]) + " " + str(s2.get_at((i, j))[0]) + " " + str(c))
-            result.set_at((i, j), Color(c, c, c))
+def bitwise_and(s1, s2, tl=(0, 0), br=SIZE):
+    result = Surface((br[0] - tl[0], br[1] - tl[1]))
+    for i in range(tl[0], br[1]):
+        for j in range(tl[1], br[1]):
+            c = s1.get_at((i - tl[0], j - tl[1]))[0] & s2.get_at((i - tl[0], j - tl[1]))[0]
+            result.set_at((i - tl[0], j - tl[1]), Color(c, c, c))
     return result
 	
 			
