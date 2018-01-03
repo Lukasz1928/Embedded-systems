@@ -10,9 +10,9 @@ X1, Y1, X2, Y2 = 0, 0, SIZE[0], SIZE[1]
 
 
 def diffImg(t0, t1, t2):
-	d1 = cv2.absdiff(t2, t1)
-	d2 = cv2.absdiff(t1, t0)
-	return cv2.bitwise_and(d1, d2)
+    d1 = cv2.absdiff(t2, t1)
+    d2 = cv2.absdiff(t1, t0)
+    return cv2.bitwise_and(d1, d2)
 
 
 def readCamera(camera):
@@ -20,14 +20,11 @@ def readCamera(camera):
     return frame
 
 
-def end(camera=None, window=None):
-	if camera is not None:
-		camera.release()
-	if window is not None:
-		cv2.destroyWindow(window)
-	sleep(0.5)
-	print("Program ended")
-	exit()
+def end(camera=None):
+    if camera is not None:
+        camera.release()
+    print("Program ended")
+    exit()
 
 
 def tryInitCamera():
@@ -72,13 +69,13 @@ def main():
         currPart = cv2.cvtColor(curr[X1:X2, Y1:Y2], cv2.COLOR_RGB2GRAY)
         diff = diffImg(prev2Part, prevPart, currPart)
 
-        partDiff = curr[:,:]
-        partDiff[X1:X2, Y1:Y2] = cv2.cvtColor(diff, cv2.COLOR_GRAY2RGB)
-        cv2.imshow(windowName, partDiff)
+        frame = curr.copy()
+        frame[X1:X2, Y1:Y2] = cv2.cvtColor(diff, cv2.COLOR_GRAY2RGB)
+        cv2.imshow(windowName, frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
               capture = False
 
-    end(cam, windowName)
+    end(cam)
 
 
 if __name__ == '__main__':
