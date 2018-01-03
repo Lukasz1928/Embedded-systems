@@ -54,13 +54,12 @@ def main():
         prev = curr
         prevPart = currPart
         curr = camera.get_image()
-
         currPart = toGrayscale(curr, tl=(X1, Y1), br=(X2, Y2))
         diff = diffImg(prev2Part, prevPart, currPart, tl=(X1, Y1), br=(X2, Y2))
         
-        partDiff = copy(curr)
-        partDiff.blit(diff, (X1, Y1))
-        display.blit(partDiff, (0, 0))
+        frame = copy(curr)
+        frame.blit(diff, (X1, Y1))
+        display.blit(frame, (0, 0))
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == KEYDOWN and event.key == K_q:
