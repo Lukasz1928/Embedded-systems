@@ -9,9 +9,6 @@
 std::tuple<int, int> size = std::make_tuple(640, 480);
 
 void end(std::string window = "") {
-	if(window != "") {
-		cv::destroyWindow(window);
-	}
 	std::cout << "Program ended\n";
 	exit(0);
 }
@@ -83,13 +80,13 @@ int main(int argc, char** argv) {
 		cv::cvtColor(currPart, currPart, cv::COLOR_RGB2GRAY);
 		diff = diffImg(prev2Part, prevPart, currPart);
 		cv::cvtColor(diff, diff, cv::COLOR_GRAY2RGB);
-		frame = curr;
+		frame = curr.clone();
 		diff.copyTo(frame.rowRange(std::get<1>(args["tl"]), std::get<1>(args["br"])).colRange(std::get<0>(args["tl"]), std::get<0>(args["br"])));
-		imshow(winName, prev);
+		imshow(winName, frame);
 		if(cv::waitKey(1) == 'q') {
 			capture = false;
 		}
 	}
-	end(winName);
+	end();
 	return 0;
 }
