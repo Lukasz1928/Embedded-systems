@@ -2,10 +2,7 @@
 #include <unistd.h>
 #include <opencv2/opencv.hpp>
 
-void end(std::string window = "") {
-	if(window != "") {
-		cv::destroyWindow(window);
-	}
+void end() {
 	std::cout << "Program ended\n";
 	exit(0);
 }
@@ -53,22 +50,22 @@ int main(int argc, char** argv) {
 	cv::Mat prev2;
 	cv::Mat prev;
 	cv::Mat curr;
+	cv::Mat frame;
 	cap >> curr;
 	cap >> prev;
 	cv::cvtColor(curr, curr, cv::COLOR_RGB2GRAY);
 	cv::cvtColor(prev, prev, cv::COLOR_RGB2GRAY);
-	
 	while(capture) {
 		prev2 = prev;
 		prev = curr;
 		cap >> curr;
 		cv::cvtColor(curr, curr, cv::COLOR_RGB2GRAY);
-		cv::Mat frame = diffImg(prev2, prev, curr);
+		frame = diffImg(prev2, prev, curr);
 		imshow(winName, frame);
 		if(cv::waitKey(10) == 'q') {
 			capture = false;
 		}
 	}
-	end(winName);
+	end();
 	return 0;
 }
