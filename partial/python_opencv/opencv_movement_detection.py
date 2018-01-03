@@ -6,8 +6,6 @@ from parser import ArgParser
 from IncorrectArgumentsException import *
 
 SIZE = (640, 480)
-X1, Y1, X2, Y2 = 0, 0, SIZE[0], SIZE[1]
-
 
 def diffImg(t0, t1, t2):
     d1 = cv2.absdiff(t2, t1)
@@ -43,6 +41,7 @@ windowName = "OpenCV movement detector"
 	
 def main():
     parser = ArgParser(SIZE[0], SIZE[1])
+    X1, Y1, X2, Y2 = 0, 0, SIZE[0], SIZE[1]
     try:
     	X1, Y1, X2, Y2 = parser.parse()
     except IncorrectArgumentsException as e:
