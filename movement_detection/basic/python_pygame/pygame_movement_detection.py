@@ -24,6 +24,7 @@ def tryInitCamera():
 
 def main():
     camera = tryInitCamera()
+    pygame.event.set_allowed([KEYDOWN])
     
     display = pygame.display.set_mode(SIZE, 0)
 
@@ -32,12 +33,12 @@ def main():
     capture = True
 
     prev2 = None
-    prev  = toGrayscale(camera.get_image())
-    curr = toGrayscale(camera.get_image())
+    prev  = toGrayscale(camera.get_image().convert())
+    curr = toGrayscale(camera.get_image().convert())
     while capture:
         prev2 = prev
         prev = curr
-        curr = toGrayscale(camera.get_image())
+        curr = toGrayscale(camera.get_image().convert())
         display.blit(diffImg(prev2, prev, curr), (0, 0))
         pygame.display.flip()
         for event in pygame.event.get():
