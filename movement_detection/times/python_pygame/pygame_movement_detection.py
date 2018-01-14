@@ -38,6 +38,7 @@ def main():
     	end()
 
     camera = tryInitCamera()
+    pygame.event.set_allowed([KEYDOWN])
     
     display = pygame.display.set_mode(SIZE, 0)
 
@@ -47,9 +48,9 @@ def main():
 
     prev2 = None
     prev2Part = None
-    prev  = camera.get_image()
+    prev  = camera.get_image().convert()
     prevPart = toGrayscale(prev, tl=(X1, Y1), br=(X2, Y2))
-    curr = camera.get_image()
+    curr = camera.get_image().convert()
     currPart = toGrayscale(curr, tl=(X1, Y1), br=(X2, Y2))
     
     file = open("../results/pg_times.csv", "a")
@@ -62,7 +63,7 @@ def main():
         prev2Part = prevPart
         prev = curr
         prevPart = currPart
-        curr = camera.get_image()
+        curr = camera.get_image().convert()
         
         start_time = time.clock_gettime(CPUTIME)
         currPart = toGrayscale(curr, tl=(X1, Y1), br=(X2, Y2))
@@ -106,7 +107,7 @@ def diffImg(t0, t1, t2, tl=(0, 0), br=SIZE):
     return bitwise_and(d1, d2, tl=tl, br=br)
 
 def pixelDiff(p1, p2):
-    result = Color(abs(p1[0] - p2[0]), abs(p1[1] - p2[1]), abs(p1[2] - p2[2]), round(abs(p1[3] + p2[3]) / 2))
+    result = Color(abs(p1[0] - p2[0]), abs(p1[1] - p2[1]), abs(p1[2] - p2[2]))
     return result
 
 def absdiff(s1, s2, tl=(0, 0), br=SIZE):
