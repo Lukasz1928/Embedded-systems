@@ -47,7 +47,6 @@ def main():
     capture = True
     while capture:
         img = readCamera(cam)
-        #img = cv2.imread('elephant.jpg', 1)
         img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         if arg == 'canny':
             med = np.median(img)
@@ -56,17 +55,15 @@ def main():
             upper = int(max(0, (1 - s) * med))
             img = cv2.Canny(img, lower, upper)
         elif arg == 'sobel':
-            img = cv2.Sobel(img, cv2.CV_8U, 1, 1, ksize=3)
+            img = cv2.Sobel(img, cv2.CV_8U, 1, 0, ksize=3)
         elif arg == 'scharr':
             kx = np.array([[-3, 0, 3], [-10, 0, 10], [-3, 0, 3]])
             ky = np.array([[-3, -10, -3], [0, 0, 0], [3, 10, 3]])
             kxy = np.array([[-6, -10, 0], [-10, 0, 10], [0, 10, 6]])
             img = cv2.filter2D(img, cv2.CV_8U, kxy) 
         elif arg == 'laplacian':
-            img = cv2.Laplacian(img, cv2.CV_8U, ksize=3)
+            img = cv2.Laplacian(img, cv2.CV_8U, ksize=5)
         cv2.imshow(winName, img)
-        #cv2.imwrite('scharrxy.jpg', img)
-        #exit()
         if cv2.waitKey(1) & 0xFF == ord('q'):
             capture = False
 
