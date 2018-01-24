@@ -1,6 +1,7 @@
 import cv2
 from sys import exit
 import sys
+import os
 from time import sleep
 import numpy as np
 
@@ -39,9 +40,9 @@ def tryInitCamera():
 
 
 def main():
+    os.chdir(sys.path[0])
     cam = tryInitCamera()
     face_cascade_front = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-    face_cascade_profile = cv2.CascadeClassifier('haarcascade_profileface.xml')
     eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
     winName = "OpenCV face detector"
     capture = True
@@ -49,21 +50,13 @@ def main():
         img = readCamera(cam)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         faces_front = face_cascade_front.detectMultiScale(gray, 1.3, 5)
-        faces_profile = face_cascade_profile.detectMultiScale(gray, 1.3, 5)
         for (x, y, w, h) in faces_front:
             cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
             roi_gray = gray[y:y+h, x:x+w]
             roi_color = img[y:y+h, x:x+w]
             eyes = eye_cascade.detectMultiScale(roi_gray)
             for (ex, ey, ew, eh) in eyes:
-                cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 2)
-        #for (x, y, w, h) in faces_profile:
-        #    cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
-        #    roi_gray = gray[y:y+h, x:x+w]
-        #    roi_color = img[y:y+h, x:x+w]
-        #    eyes = eye_cascade.detectMultiScale(roi_gray)
-        #    for (ex, ey, ew, eh) in eyes:
-        #        cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 2)        
+                cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 2)      
         cv2.imshow(winName, img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             capture = False
