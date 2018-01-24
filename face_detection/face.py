@@ -3,7 +3,6 @@ from sys import exit
 import sys
 from time import sleep
 import numpy as np
-from parser import ArgParser
 
 def diffImg(t0, t1, t2):
     d1 = cv2.absdiff(t2, t1)
@@ -58,13 +57,13 @@ def main():
             eyes = eye_cascade.detectMultiScale(roi_gray)
             for (ex, ey, ew, eh) in eyes:
                 cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 2)
-        for (x, y, w, h) in faces_profile:
-            cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0),2 )
-            roi_gray = gray[y:y+h, x:x+w]
-            roi_color = img[y:y+h, x:x+w]
-            eyes = eye_cascade.detectMultiScale(roi_gray)
-            for (ex, ey, ew, eh) in eyes:
-                cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 2)        
+        #for (x, y, w, h) in faces_profile:
+        #    cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
+        #    roi_gray = gray[y:y+h, x:x+w]
+        #    roi_color = img[y:y+h, x:x+w]
+        #    eyes = eye_cascade.detectMultiScale(roi_gray)
+        #    for (ex, ey, ew, eh) in eyes:
+        #        cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 2)        
         cv2.imshow(winName, img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             capture = False
